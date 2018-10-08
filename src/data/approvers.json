@@ -1,0 +1,7 @@
+{
+	"anne@oaf.org": ["bob@oaf.org", "carol@oaf.org"],
+	"bob@oaf.org": ["carol@oaf.org"],
+	"carol@oaf.org": ["edith@oaf.org"],
+	"david@oaf.org" : ["carol@oaf.org", "edith@oaf.org"],
+	"stanley@aof.org": ["andrew@aof.org", "cathy@oaf.org", "mary@aof.org"]
+}

@@ -1,0 +1,29 @@
+{
+	"anne@oaf.org": {
+		"grade": "JG4"
+	},
+	"stanley@aof.org": {
+		"grade": "JG3"
+	},
+	"bob@oaf.org": {
+		"grade": "JG5"
+	},
+	"carol@oaf.org": {
+		"grade": "JG6"
+	},
+	"david@oaf.org": {
+		"grade": "JG4"
+	},
+	"edith@oaf.org": {
+		"grade": "JG6"
+	},
+	"cathy@oaf.org": {
+		"grade": "JG7"
+	},
+	"andrew@aof.org": {
+		"grade": "JG5"
+	},
+	"mary@aof.org": {
+		"grade": "JG8"
+	}
+}
