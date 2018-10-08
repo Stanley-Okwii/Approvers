@@ -5,19 +5,21 @@ import { Form, Dropdown, Button, Grid, Header, Message } from 'semantic-ui-react
 import { ApproverFinder } from '../components/ApproverFinder';
 
 describe('Approver Finder',() => {
-  it('finds all approvers for a given user', () => {
-    const addMock = jest.spyOn(ApproverFinder, "findApprover");
-    // const fullRender = mount(<ApproverFinder />);
-    expect(addMock).toHaveBeenCalledWith(1, 2);
+    const mockFindApprover = jest.fn();
+    jest.mock('./sound-player', () => {
+      return jest.fn().mockImplementation(() => {
+        return {FindApprover: mockFindApprover};
+        // Now we can track calls to playSoundFile
+      });
+    });
 
-    // // const mockFn = jest.fn()('findApprover');
-    // console.log(mockFn.results());
-    // const findApprover = jest.spyOn(fullRenderInstance, "findApprover").and.callThrough()
-    // const signaturePadInstance = wrapper.instance();
-    // console.log(wrapper.debug())
-    // console.log(signaturePadInstance)//   const welcome = <h2>Welcome to React</h2>
-    // expect(wrapper.contains(welcome)).toBe(true);
-  //   expect(wrapper.contains(welcome)).toEqual(true);
+    beforeEach(() => {
+        FindApprover.mockClear();
+        FindApprover.mockClear();
+      });
+
+  it('finds all approvers for a given user', () => {
+  
   });
 
   it('renders structure correctly', () => {
