@@ -109,6 +109,7 @@ export class ApproverFinder extends React.Component {
             let newApprover = "";
             const userArray = Object.entries(this.props.users);
 
+            // if()
             if (possibleApprovers && possibleApprovers.length >= 1) {
                 this.setState({ content: possibleApprovers[0], success: true })
             } else {
