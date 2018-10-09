@@ -13,7 +13,7 @@ export class ApproverFinder extends React.Component {
             content: "",
             success: false,
             cache: [
-                { user: "", approver: "" }
+                { user: "stanley@aof.org", approver: "anne@aof.org" }
             ]
         };
     }
@@ -40,7 +40,13 @@ export class ApproverFinder extends React.Component {
                                 Find Approver
                             </Button>
                             <Button className='find-nearest-approver' onClick={() => this.findNearestApprover(this.state.selectedUser)}>
-                                Find Nearest Approver</Button>
+                                Find Nearest Approver
+                            </Button>
+                            <Form.Field>
+                            <Button className='find-nearest-approver-extended' onClick={() => this.findNearestApproverExtended(this.state.selectedUser)}>
+                                Find Nearest Approver Extended
+                            </Button>
+                            </Form.Field>
                         </Form>
                         <Message header="Approvers" content={this.state.content} success={this.state.success} />
                     </Grid.Column>
@@ -108,19 +114,35 @@ export class ApproverFinder extends React.Component {
             let possibleApprovers = this.props.approvers[user];
             let newApprover = "";
             const userArray = Object.entries(this.props.users);
+    
+            const searchedUser = this.state.cache.filter(option => option.user === user);
+            if (searchedUser.length > 0) {
+                newApprover = searchedUser[0].approver;
 
-            // if()
+                this.setState({ content: newApprover, success: true });
+
+                return;
+            }
+
             if (possibleApprovers && possibleApprovers.length >= 1) {
-                this.setState({ content: possibleApprovers[0], success: true })
+                this.cacheUpdate = this.state.cache;
+                this.cacheUpdate.push({ user: user ,approver: possibleApprovers[0] });
+                this.setState({ content: possibleApprovers[0], success: true , cache: this.cacheUpdate });
             } else {
                 userArray.forEach(([name, { grade }]) => {
                     const newGrade = Number(grade[grade.length - 1]);
                     const difference = Math.abs(this.getUserIndex(user) - newGrade);
+
+                    
                     if ((difference === 1) && (this.getUserIndex(user) < newGrade)) {
                         newApprover = name;
-                        this.setState({ content: newApprover, success: true })
+                        this.cacheUpdate = this.state.cache;
+                        this.cacheUpdate.push({ user: user, approver: newApprover });
+                        this.setState({ content: newApprover, success: true, cache: this.cacheUpdate });
                     } else {
-                        this.setState({ content: `${this.state.selectedUser} is at highest grade level`, success: false })
+                        this.cacheUpdate = this.state.cache;
+                        this.cacheUpdate.push({ user: user, approver: `${this.state.selectedUser} is at highest grade level` });
+                        this.setState({ content: `${this.state.selectedUser} is at highest grade level`, success: false, cache: this.cacheUpdate });
                     }
                 });
             }
