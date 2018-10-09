@@ -11,10 +11,11 @@ export class ApproverFinder extends React.Component {
         this.state = {
             selectedUser: "",
             content: "",
-            success: false
+            success: false,
+            cache: [
+                { user: "", approver: "" }
+            ]
         };
-        this.users = require("../data/users.json");
-        this.approvers = require("../data/approvers.json");
     }
 
     render() {
@@ -29,16 +30,16 @@ export class ApproverFinder extends React.Component {
                             <Form.Field>
                                 <Dropdown
                                     placeholder="Select user"
-                                    scrolling={true}
+                                    scrolling={false}
                                     selection
-                                    options={this.createOptions(this.users)}
+                                    options={this.createOptions(this.props.users)}
                                     onChange={(metaData, selected) => this.setState({ selectedUser: selected.value, content: "", success: false })}
                                 />
                             </Form.Field>
-                            <Button onClick={() => this.findApprover(this.state.selectedUser)}>
+                            <Button className='find-approver' onClick={() => this.findApprover(this.state.selectedUser)}>
                                 Find Approver
                             </Button>
-                            <Button onClick={() => this.findNearestApprover(this.state.selectedUser)}>
+                            <Button className='find-nearest-approver' onClick={() => this.findNearestApprover(this.state.selectedUser)}>
                                 Find Nearest Approver</Button>
                         </Form>
                         <Message header="Approvers" content={this.state.content} success={this.state.success} />
@@ -49,7 +50,7 @@ export class ApproverFinder extends React.Component {
     }
 
     getUserIndex = (username) => {
-        const grade = this.users[username]["grade"];
+        const grade = this.props.users[username]["grade"];
         return Number(grade[grade.length - 1])
     }
 
@@ -67,7 +68,7 @@ export class ApproverFinder extends React.Component {
 
     findApprover = (user) => {
         if (user) {
-            const possibleApprovers = this.approvers[user];
+            const possibleApprovers = this.props.approvers[user];
             if (possibleApprovers) {
                 this.setState({ content: possibleApprovers.join(", "), success: true })
             } else {
@@ -80,9 +81,9 @@ export class ApproverFinder extends React.Component {
 
     findNearestApprover = (user) => {
         if (user) {
-            let possibleApprovers = this.approvers[user];
+            let possibleApprovers = this.props.approvers[user];
             let newApprover = "";
-            const userArray = Object.entries(this.users);
+            const userArray = Object.entries(this.props.users);
             if (possibleApprovers && possibleApprovers.length >= 1) {
                 this.setState({ content: possibleApprovers[0], success: true })
             } else {
@@ -93,7 +94,32 @@ export class ApproverFinder extends React.Component {
                         newApprover = name;
                         this.setState({ content: newApprover, success: true })
                     } else {
-                        this.setState({ content: `${this.state.selectedUser} is at highest grade level `, success: false })
+                        this.setState({ content: `${this.state.selectedUser} is at highest grade level`, success: false })
+                    }
+                });
+            }
+        } else {
+            this.setState({ content: `Select a user and try again` });
+        }
+    }
+
+    findNearestApproverExtended = (user) => {
+        if (user) {
+            let possibleApprovers = this.props.approvers[user];
+            let newApprover = "";
+            const userArray = Object.entries(this.props.users);
+
+            if (possibleApprovers && possibleApprovers.length >= 1) {
+                this.setState({ content: possibleApprovers[0], success: true })
+            } else {
+                userArray.forEach(([name, { grade }]) => {
+                    const newGrade = Number(grade[grade.length - 1]);
+                    const difference = Math.abs(this.getUserIndex(user) - newGrade);
+                    if ((difference === 1) && (this.getUserIndex(user) < newGrade)) {
+                        newApprover = name;
+                        this.setState({ content: newApprover, success: true })
+                    } else {
+                        this.setState({ content: `${this.state.selectedUser} is at highest grade level`, success: false })
                     }
                 });
             }

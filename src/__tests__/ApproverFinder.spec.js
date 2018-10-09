@@ -1,61 +1,135 @@
 import React from 'react';
 import { shallow, mount, render } from 'enzyme';
-import { Form, Dropdown, Button, Grid, Header, Message } from 'semantic-ui-react';
 
 import { ApproverFinder } from '../components/ApproverFinder';
 
-describe('Approver Finder',() => {
-    const mockFindApprover = jest.fn();
-    jest.mock('./sound-player', () => {
-      return jest.fn().mockImplementation(() => {
-        return {FindApprover: mockFindApprover};
-        // Now we can track calls to playSoundFile
-      });
+const users = {
+    "stanley@aof.org": {
+        "grade": "JG3"
+    },
+    "anne@oaf.org": {
+        "grade": "JG4"
+    },
+    "bob@oaf.org": {
+        "grade": "JG5"
+    }
+};
+
+const approvers = {
+    "stanley@oaf.org": ["anne@oaf.org", "bob@oaf.org"],
+    "anne@oaf.org": ["bob@oaf.org"]
+};
+
+describe('Approver Finder', () => {
+    const wrapper = mount(<ApproverFinder users={users} approvers={approvers} />);
+    const instance = wrapper.instance();
+
+    it('calls findApprover function when "Find Approver" button is clicked', () => {
+        jest.spyOn(instance, 'findApprover');
+        wrapper.find('.dropdown.icon').simulate('click');
+        wrapper.find('.selected.item').simulate('click');
+
+        expect(wrapper.find('.ui.selection.dropdown .text').at(0).text()).toBe('stanley@aof.org');
+
+        wrapper.find('.ui.button.find-approver').simulate('click');
+
+        expect(instance.findApprover).toHaveBeenCalled();
     });
 
-    beforeEach(() => {
-        FindApprover.mockClear();
-        FindApprover.mockClear();
-      });
+    it('calls findNearestApprover function when "Find Nearest Approver" button is clicked', () => {
+        jest.spyOn(instance, 'findNearestApprover');
+        wrapper.find('.dropdown.icon').simulate('click');
+        wrapper.find('.selected.item').simulate('click');
 
-  it('finds all approvers for a given user', () => {
-  
-  });
+        expect(wrapper.find('.ui.selection.dropdown .text').at(0).text()).toBe('stanley@aof.org');
 
-  it('renders structure correctly', () => {
-    const renderApprover = shallow(<ApproverFinder />);
-    // const renderApproverInstance = renderApprover.instance();
+        wrapper.find('.ui.button.find-nearest-approver').simulate('click');
 
-    const ApproverStructure = 
-      <div>
-      <Grid textAlign='center' verticalAlign='middle'>
-          <Grid.Column>
-              <Header as='h2' color='teal' textAlign='center'>
-                  One Acre Fund: Approver Finder
-              </Header>
-              <Form size="large">
-                  <Form.Field>
-                      <Dropdown
-                          placeholder="Select user"
-                          scrolling={true}
-                          selection
-                          options={[]}
-                          onChange={jest.fn()}
-                      />
-                  </Form.Field>
-                  <Button onClick={jest.fn()}>
-                      Find Approver
-                  </Button>
-                  <Button onClick={jest.fn()}>
-                      Find Nearest Approver</Button>
-              </Form>
-              <Message header="Approvers" content="" success={false} />
-          </Grid.Column>
-      </Grid>
-  </div>;
+        expect(instance.findNearestApprover).toHaveBeenCalled();
+    });
 
-  // expect(renderApprover).tob(ApproverStructure);
-  });
+    it('finds nearest approver for a given user', () => {
+        jest.spyOn(instance, 'findNearestApprover');
+        wrapper.find('.dropdown.icon').simulate('click');
+        wrapper.find('.selected.item').simulate('click');
+
+        expect(wrapper.find('.ui.selection.dropdown .text').at(0).text()).toBe('stanley@aof.org');
+
+        wrapper.find('.ui.button.find-nearest-approver').simulate('click');
+
+        expect(instance.findNearestApprover).toHaveBeenCalled();
+    });
+
+    it('renders structure correctly', () => {
+        const renderApprover = mount(<ApproverFinder users={users} approvers={approvers} />);
+
+        expect(renderApprover.find('.ui.button.find-approver').text()).toBe('Find Approver');
+        expect(renderApprover.find('.ui.button.find-nearest-approver').text()).toBe('Find Nearest Approver');
+        expect(renderApprover.find('.default.text').text()).toBe('Select user');
+
+        renderApprover.find('.dropdown.icon').simulate('click');
+        renderApprover.find('.selected.item').simulate('click');
+
+        expect(renderApprover.find('.ui.selection.dropdown .text').at(0).text()).toBe('stanley@aof.org');
+    });
+});
+
+describe('Finder Approver function', () => {
+    const wrapper = mount(<ApproverFinder users={users} approvers={approvers} />);
+    const instance = wrapper.instance();
+    
+    it('sets content state to approvers when a user has approvers', () => {
+        instance.setState({ selectedUser: 'stanley@oaf.org'});
+        jest.spyOn(instance, 'findApprover');
+        wrapper.find('.ui.button.find-approver').simulate('click');
+
+        expect(instance.state.content).toBe('anne@oaf.org, bob@oaf.org');
+    });
+
+    it('sets content state to "Select user and try again" when no user is selected', () => {
+        instance.setState({ selectedUser: ''});
+        jest.spyOn(instance, 'findApprover');
+        wrapper.find('.ui.button.find-approver').simulate('click');
+
+        expect(instance.state.content).toBe('Select a user and try again');
+    });
 
 
+    it('sets content state to "No approvers found" when a user have default approvers', () => {
+        instance.setState({ selectedUser: 'idonthaveapprovers@aof.org'});
+        jest.spyOn(instance, 'findApprover');
+        wrapper.find('.ui.button.find-approver').simulate('click');
+
+        expect(instance.state.content).toBe('No approvers found');
+    });
+});
+
+describe('Finder Nearest Approver function', () => {
+    const wrapper = mount(<ApproverFinder users={users} approvers={approvers} />);
+    const instance = wrapper.instance();
+    
+    it('sets content state to nearest approver when a user has approvers', () => {
+        instance.setState({ selectedUser: 'stanley@oaf.org'});
+        jest.spyOn(instance, 'findNearestApprover');
+        wrapper.find('.ui.button.find-nearest-approver').simulate('click');
+
+        expect(instance.state.content).toBe('anne@oaf.org');
+    });
+
+    it('sets content state to "Select user and try again" when no user is selected', () => {
+        instance.setState({ selectedUser: ''});
+        jest.spyOn(instance, 'findNearestApprover');
+        wrapper.find('.ui.button.find-nearest-approver').simulate('click');
+
+        expect(instance.state.content).toBe('Select a user and try again');
+    });
+
+
+    it('sets content state to "user@aof.org is at highest level" when a user have default approvers', () => {
+        instance.setState({ selectedUser: 'bob@oaf.org'});
+        jest.spyOn(instance, 'findNearestApprover');
+        wrapper.find('.ui.button.find-nearest-approver').simulate('click');
+
+        expect(instance.state.content).toBe('bob@oaf.org is at highest grade level');
+    });
 });
