@@ -2,10 +2,10 @@
 Find approvers for a given user
 
 ## Demo app
-[https://dropdowntypeahead.mxapps.io](sandbox demo project) //TODO: replace with code sandbox link
+ [Click here to view project](https://zkv6o2pool.codesandbox.io/)
 
-# How to run Approver Finder app locally
- ## Prerequisite: node package manager, node js, webpack CLI
+## How to run Approver Finder app locally
+ ### Prerequisite: node package manager, node js, webpack CLI
  
  To run project, extract the approverfinder.zip folder or fork and clone from github
  

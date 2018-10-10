@@ -13,7 +13,7 @@ export class ApproverFinder extends React.Component {
             content: "",
             success: false,
             cache: [
-                { user: "stanley@aof.org", approver: "anne@aof.org" }
+                { user: "", approver: "" }
             ]
         };
     }
@@ -42,11 +42,9 @@ export class ApproverFinder extends React.Component {
                             <Button className='find-nearest-approver' onClick={() => this.findNearestApprover(this.state.selectedUser)}>
                                 Find Nearest Approver
                             </Button>
-                            <Form.Field>
                             <Button className='find-nearest-approver-extended' onClick={() => this.findNearestApproverExtended(this.state.selectedUser)}>
-                                Find Nearest Approver Extended
+                                Find Approver Extended
                             </Button>
-                            </Form.Field>
                         </Form>
                         <Message header="Approvers" content={this.state.content} success={this.state.success} />
                     </Grid.Column>
